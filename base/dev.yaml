@@ -1,29 +1,35 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: apps-from-directories
+  name: dev
   namespace: argocd
 spec:
+  goTemplate: true
   generators:
     - git:
         repoURL: https://github.com/scpatt/argocd-example.git
         revision: HEAD
-        directories:
-          - path: apps/*
+        files:
+          - path: "services/**/generator-dev.yaml"
   template:
     metadata:
-      name: '{{path.basename}}'
+      name: '{{ path.basename }}'
+      annotations:
+        argocd.argoproj.io/manifest-generate-paths: '/{{ .path.path }}'
     spec:
       project: default
       source:
         repoURL: https://github.com/scpatt/argocd-example.git
         targetRevision: HEAD
-        path: '{{path}}'
-        directory:
-          recurse: true
+        path: '{{ .path.path }}'
+        helm:
+          releaseName: '{{ .serviceName }}'
+          valueFiles:
+            - values.yaml
+            - '{{ .valueFile }}'
       destination:
         server: https://kubernetes.default.svc
-        namespace: apps
+        namespace: '{{ .namespace }}'
       syncPolicy:
         automated:
           prune: true
