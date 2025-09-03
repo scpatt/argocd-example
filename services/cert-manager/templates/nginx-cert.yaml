@@ -1,0 +1,15 @@
+{{- if .Values.issuers.ca.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nginx-tls
+  namespace: apps
+spec:
+  secretName: nginx-tls
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+  dnsNames:
+  - nginx.local
+  - nginx.apps.svc.cluster.local
+{{- end }}

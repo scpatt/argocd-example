@@ -1,9 +1,8 @@
 nginx:
   replicaCount: 1
-  containerPort: 80
-
 service:
   type: NodePort
-  port: 80
-  targetPort: 80
-  nodePort: 30080
+  ports:
+    http: 80
+  nodePorts:
+    http: 30080
